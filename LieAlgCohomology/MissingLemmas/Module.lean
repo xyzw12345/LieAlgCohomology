@@ -15,5 +15,3 @@ def Module.ofAddMonoidEnd {R M : Type*} [Semiring R] [AddCommGroup M] (φ : R �
 @[ext]
 theorem AddMonoidEnd.ext {M : Type*} [AddCommGroup M] (f g : AddMonoid.End M) (h : ∀ (x : M), f x = g x)
   : f = g := AddMonoidHom.ext h
-
-def LinearMap.toAddMonoidHomHom {R M : Type*} [Semiring R] [AddCommGroup M] [Module R M] : Module.End R M →+* AddMonoid.End M := Module.toAddMonoidEnd (Module.End R M) M

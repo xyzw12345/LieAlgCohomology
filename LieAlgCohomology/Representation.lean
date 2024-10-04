@@ -1,14 +1,19 @@
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Equivalence
+import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Algebra.Lie.Derivation.Basic
 import Mathlib.Algebra.Lie.UniversalEnveloping
 import LieAlgCohomology.MissingLemmas.Module
+import LieAlgCohomology.MissingLemmas.UniversalEnveloping
 
 #check LieDerivation
 #check MonoidAlgebra
 #check LieModuleHom
+
+-- define the type synonym `M.asModule` for `M`
+-- put the definition `LieModuleCat.toModuleUniversalAlgebra_objMap` on `M.asModule`
 
 namespace LieModuleCat
 
@@ -46,33 +51,53 @@ instance {M N : LieModuleCat R L} : FunLike (M ⟶ N) M N :=
 lemma ext {M N : LieModuleCat R L} (f g : M ⟶ N) (h : ∀ (x : M), f x = g x) :
   f = g := DFunLike.ext _ _ h
 
+def toModuleUniversalAlgebra_objMap_smul (M : LieModuleCat R L) :
+  UniversalEnvelopingAlgebra R L →ₐ[R] (Module.End R M) :=
+    UniversalEnvelopingAlgebra.lift R (L := L) (A := Module.End R M) (LieModule.toEnd R L M)
+
 def toModuleUniversalAlgebra_objMap (M : LieModuleCat R L) : Module (UniversalEnvelopingAlgebra R L) M :=
   @Module.ofAddMonoidEnd _ _ _ _ ((Module.toAddMonoidEnd (Module.End R M) M).comp
-   ((UniversalEnvelopingAlgebra.lift R (L := L) (A := Module.End R (M : Type v))
-    (LieModule.toEnd R L M)).1))
+   (toModuleUniversalAlgebra_objMap_smul R L M))
 
 attribute [instance] toModuleUniversalAlgebra_objMap
 
 def toModuleUniversalAlgebra : LieModuleCat R L ⥤ ModuleCat (UniversalEnvelopingAlgebra R L) where
   obj M := ⟨M⟩
-  map {M N} f := {
-    toFun := f
-    map_add' := f.map_add
-    map_smul' := fun m x ↦ (by
-      dsimp
-      show f ((toModuleUniversalAlgebra_objMap R L M).toAddMonoidEnd m x) =
-        (toModuleUniversalAlgebra_objMap R L N).toAddMonoidEnd m (f x)
-      sorry)
-  }
+  map {M N} f := ⟨f.toLinearMap.toAddHom, fun m x ↦ (by
+    show (f.toLinearMap.comp (toModuleUniversalAlgebra_objMap_smul R L M m)) x
+      = ((toModuleUniversalAlgebra_objMap_smul R L N m).comp f.toLinearMap) x
+    congr 1
+    apply UniversalEnvelopingAlgebra.induction (a := m)
+    · intro r; ext x; simp
+    · intro l; ext x; unfold toModuleUniversalAlgebra_objMap_smul; simp
+    · intro a b ha hb; simp;
+      show f.toLinearMap ∘ₗ ((toModuleUniversalAlgebra_objMap_smul R L M a) ∘ₗ (toModuleUniversalAlgebra_objMap_smul R L M b)) = (((toModuleUniversalAlgebra_objMap_smul R L N a) ∘ₗ (toModuleUniversalAlgebra_objMap_smul R L N b)) ∘ₗ f.toLinearMap)
+      rw [LinearMap.comp_assoc, ← hb, ← LinearMap.comp_assoc, ← LinearMap.comp_assoc, ha]
+    · intro a b ha hb; ext x; simp;
+      apply_fun (fun f ↦ f x) at ha hb
+      congr 1
+  )⟩
   map_id M := by ext x; rfl
   map_comp f g := by ext x; rfl
 
 attribute [-instance] toModuleUniversalAlgebra_objMap
 
+def ofModuleUniversalAlgebra_objMap_isModule_smul (M : ModuleCat (UniversalEnvelopingAlgebra R L)) : R →+* AddMonoid.End M :=
+  (Module.toAddMonoidEnd (UniversalEnvelopingAlgebra R L) M).comp (algebraMap R (UniversalEnvelopingAlgebra R L))
+
 def ofModuleUniversalAlgebra_objMap_isModule (M : ModuleCat (UniversalEnvelopingAlgebra R L)) :
-  Module R M := by sorry
+  Module R M :=
+    Module.ofAddMonoidEnd (ofModuleUniversalAlgebra_objMap_isModule_smul R L M)
 
 attribute [instance] ofModuleUniversalAlgebra_objMap_isModule
+
+instance ofModuleUniversalAlgebra_objMap_isModule_isScalerTower (M : ModuleCat (UniversalEnvelopingAlgebra R L)) : IsScalarTower R (UniversalEnvelopingAlgebra R L) M where
+  smul_assoc := fun x y z ↦ by
+    show (x • y) • z = (ofModuleUniversalAlgebra_objMap_isModule_smul R L M x) (y • z)
+    unfold ofModuleUniversalAlgebra_objMap_isModule_smul
+    rw [RingHom.coe_comp, Function.comp_apply]
+    show (x • y) • z = ((algebraMap R (UniversalEnvelopingAlgebra R L)) x) • (y • z)
+    rw [smul_smul, Algebra.smul_def]
 
 def ofModuleUniversalAlgebra_objMap_isLieRingModule (M : ModuleCat (UniversalEnvelopingAlgebra R L)) :
   LieRingModule L M := by sorry
@@ -86,12 +111,7 @@ attribute [instance] ofModuleUniversalAlgebra_objMap_isLieModule
 
 def ofModuleUniversalAlgebra : ModuleCat (UniversalEnvelopingAlgebra R L) ⥤ LieModuleCat R L where
   obj M := ⟨M⟩
-  map {M N} f := {
-    toFun := f
-    map_add' := f.map_add
-    map_smul' := sorry
-    map_lie' := sorry
-  }
+  map {M N} f := ⟨⟨f.toAddHom, sorry⟩, sorry⟩
   map_id M := by ext x; rfl
   map_comp f g := by ext x; rfl
 
