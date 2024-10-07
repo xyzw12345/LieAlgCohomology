@@ -1,5 +1,6 @@
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Equivalence
+import Mathlib.CategoryTheory.Preadditive.Projective
 import Mathlib.Algebra.Group.Action.Defs
 import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Category.ModuleCat.Basic
@@ -126,11 +127,15 @@ def ofModuleUniversalAlgebra : ModuleCat (UniversalEnvelopingAlgebra R L) ⥤ Li
   map_id M := by ext x; rfl
   map_comp f g := by ext x; rfl
 
-def equivalenceLieDerivationModuleUniversalAlgebra :
+def equivalenceLieModuleUniversalAlgebra :
   LieModuleCat R L ≌ ModuleCat (UniversalEnvelopingAlgebra R L) where
     functor := toModuleUniversalAlgebra R L
     inverse := ofModuleUniversalAlgebra R L
     unitIso := sorry
     counitIso := sorry
+
+instance : EnoughProjectives (LieModuleCat R L) :=
+  equivalenceLieModuleUniversalAlgebra.enoughProjectives_iff.2
+    ModuleCat.moduleCat_enoughProjectives
 
 end LieModuleCat
