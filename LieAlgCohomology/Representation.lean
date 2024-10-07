@@ -122,7 +122,7 @@ instance ofModuleUniversalAlgebra_objMap_isLieModule (M : ModuleCat (UniversalEn
 
 def ofModuleUniversalAlgebra : ModuleCat (UniversalEnvelopingAlgebra R L) ⥤ LieModuleCat R L where
   obj M := ⟨M⟩
-  map {M N} f := ⟨⟨f.toAddHom, sorry⟩, sorry⟩
+  map {M N} f := ⟨⟨f.toAddHom, by simp⟩, fun {x m} ↦ by exact map_smul f ((ι R) x) m⟩
   map_id M := by ext x; rfl
   map_comp f g := by ext x; rfl
 
