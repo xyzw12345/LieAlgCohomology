@@ -107,14 +107,18 @@ instance ofModuleUniversalAlgebra_objMap_isLieRingModule (M : ModuleCat (Univers
       exact smul_add _ m n
     leibniz_lie := fun x y m ↦ by
       show (ι R x) • ((ι R y) • m) = (ι R ⁅x, y⁆) • m + (ι R y) • ((ι R x) • m)
-      rw [smul_smul, smul_smul, ← add_smul, LieHom.map_lie];
-      congr 1; exact Eq.symm (add_eq_of_eq_sub rfl)
+      rw [smul_smul, smul_smul, ← add_smul, LieHom.map_lie]
+      rw [LieRing.of_associative_ring_bracket, sub_add_cancel]
 
 
 instance ofModuleUniversalAlgebra_objMap_isLieModule (M : ModuleCat (UniversalEnvelopingAlgebra R L)) :
-  LieModule R L M := by sorry
-
-attribute [instance] ofModuleUniversalAlgebra_objMap_isLieModule
+  LieModule R L M where
+    smul_lie := fun t x m ↦ by
+      show (ι R (t • x)) • m = t • ((ι R x) • m)
+      simp
+    lie_smul := fun t x m ↦ by
+      show (ι R x) • (t • m) = t • ((ι R x) • m)
+      exact smul_comm (ι R x) t m
 
 def ofModuleUniversalAlgebra : ModuleCat (UniversalEnvelopingAlgebra R L) ⥤ LieModuleCat R L where
   obj M := ⟨M⟩
