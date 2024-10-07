@@ -3,6 +3,7 @@ import Mathlib
 #check groupCohomology
 #check Rep.trivial
 #check ExteriorAlgebra
+#check TensorAlgebra
 #check AlternatingMap
 #check ExteriorAlgebra.liftAlternatingEquiv
 #check TensorProduct
@@ -14,6 +15,12 @@ import Mathlib
 #check AlgHom
 #check LinearMap
 #check Module.Free.tensor
+
+#check Algebra
+
+#check GradedAlgebra
+
+#check RingQuot
 
 noncomputable section
 universe u
