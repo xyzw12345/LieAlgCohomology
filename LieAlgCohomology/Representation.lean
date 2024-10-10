@@ -1,15 +1,12 @@
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Equivalence
 import Mathlib.CategoryTheory.Preadditive.Projective
-import Mathlib.Algebra.Group.Action.Defs
-import Mathlib.Algebra.Module.Defs
 import Mathlib.Algebra.Category.ModuleCat.Basic
-import Mathlib.Algebra.Lie.Derivation.Basic
+import Mathlib.Algebra.Category.ModuleCat.Projective
 import Mathlib.Algebra.Lie.UniversalEnveloping
 import LieAlgCohomology.MissingLemmas.Module
 import LieAlgCohomology.MissingLemmas.UniversalEnveloping
 
-#check LieDerivation
 #check MonoidAlgebra
 #check LieModuleHom
 
@@ -111,7 +108,6 @@ instance ofModuleUniversalAlgebra_objMap_isLieRingModule (M : ModuleCat (Univers
       rw [smul_smul, smul_smul, ← add_smul, LieHom.map_lie]
       rw [LieRing.of_associative_ring_bracket, sub_add_cancel]
 
-
 instance ofModuleUniversalAlgebra_objMap_isLieModule (M : ModuleCat (UniversalEnvelopingAlgebra R L)) :
   LieModule R L M where
     smul_lie := fun t x m ↦ by
@@ -134,8 +130,10 @@ def equivalenceLieModuleUniversalAlgebra :
     unitIso := sorry
     counitIso := sorry
 
-instance : EnoughProjectives (LieModuleCat R L) :=
-  equivalenceLieModuleUniversalAlgebra.enoughProjectives_iff.2
-    ModuleCat.moduleCat_enoughProjectives
+/--
+Note: the universe level is taken to be {u, v, max u v} instead of {u, v, w} is because that for some reasons I still don't understand, the universe level in `ModuleCat.moduleCat_enoughProjectives` has been specified.
+-/
+instance : EnoughProjectives (LieModuleCat.{u, v, max u v} R L) := by
+  apply (Equivalence.enoughProjectives_iff (equivalenceLieModuleUniversalAlgebra R L)).2 ModuleCat.moduleCat_enoughProjectives
 
 end LieModuleCat
