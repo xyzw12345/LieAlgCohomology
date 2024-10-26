@@ -1,6 +1,6 @@
 import Mathlib
 
-open BigOperators TensorProduct DirectSum
+open BigOperators TensorProduct DirectSum TensorAlgebra
 -- import Mathlib.RingTheory.TensorProduct.Basic
 
 -- set_option diagnostics true
@@ -29,12 +29,15 @@ local notation "ιₜ" => TensorAlgebra.ι k
 -- def TensorProduct.toTensorPower (v : V⊗[k]V) : ⨂[k]^2 V :=
 --   (TensorProduct.two_equiv k V).toFun v
 
-def 𝔗' := ⨁ n, ⨂[k]^n V
+-- def 𝔗' := ⨁ n, ⨂[k]^n V
 
 abbrev 𝔗 := TensorAlgebra k V
 
 def I := TwoSidedIdeal.span {(ιₜ x * ιₜ y - ιₜ y * ιₜ x) | (x : V) (y : V)}
 
+/-
+  The 𝔖 defined here is the symmetric algebra.
+-/
 def 𝔖 := RingQuot (I k V).ringCon.r
 
 #check 𝔖 k V
@@ -44,6 +47,8 @@ instance : Ring (𝔖 k V) := inferInstanceAs (Ring (RingQuot (I k V).ringCon.r)
 instance : Algebra k (𝔖 k V) := inferInstanceAs (Algebra k (RingQuot (I k V).ringCon.r))
 
 def J := TwoSidedIdeal.span {ιₜ x * ιₜ y - ιₜ y * ιₜ x - ιₜ ⁅x, y⁆ | (x : V) (y : V)}
+
+#synth GradedRing ((LinearMap.range (ι k : V →ₗ[k] TensorAlgebra k V) ^ ·))
 
 def filtration (m : ℕ) (T : Type*) [AddCommMonoid T] [Module k T] : Submodule k T := sorry
 
