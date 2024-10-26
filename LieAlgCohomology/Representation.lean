@@ -1,8 +1,11 @@
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.CategoryTheory.Equivalence
 import Mathlib.CategoryTheory.Preadditive.Projective
+import Mathlib.CategoryTheory.Abelian.Basic
+import Mathlib.CategoryTheory.Abelian.Transfer
 import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Algebra.Category.ModuleCat.Projective
+import Mathlib.Algebra.Category.ModuleCat.Abelian
 import Mathlib.Algebra.Lie.UniversalEnveloping
 import LieAlgCohomology.MissingLemmas.Module
 import LieAlgCohomology.MissingLemmas.UniversalEnveloping
@@ -12,6 +15,8 @@ import LieAlgCohomology.MissingLemmas.UniversalEnveloping
 
 -- define the type synonym `M.asModule` for `M`
 -- put the definition `LieModuleCat.toModuleUniversalAlgebra_objMap` on `M.asModule`
+
+suppress_compilation
 
 namespace LieModuleCat
 
@@ -135,5 +140,16 @@ Note: the universe level is taken to be {u, v, max u v} instead of {u, v, w} is 
 -/
 instance : EnoughProjectives (LieModuleCat.{u, v, max u v} R L) := by
   apply (Equivalence.enoughProjectives_iff (equivalenceLieModuleUniversalAlgebra R L)).2 ModuleCat.moduleCat_enoughProjectives
+
+instance : Preadditive (LieModuleCat R L) := sorry
+
+instance : Limits.HasFiniteProducts (LieModuleCat R L) := sorry
+
+set_option diagnostics true
+
+instance : Limits.HasZeroMorphisms (LieModuleCat R L) := by sorry
+
+instance : Abelian (LieModuleCat R L) := abelianOfEquivalence (F := (equivalenceLieModuleUniversalAlgebra R L).1)
+
 
 end LieModuleCat

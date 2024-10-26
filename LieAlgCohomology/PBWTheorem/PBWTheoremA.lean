@@ -15,31 +15,33 @@ local notation "ιₜ" => TensorAlgebra.ι k
 
 -- instance : Ring (TensorProduct k V V) := sorry
 
-def TensorProduct.two_equiv : V⊗[k]V ≃ₗ[k] ⨂[k]^2 V := by
-  have h1 : TensorProduct k (⨂[k]^1 V) (⨂[k]^1 V) ≃ₗ[k] TensorPower k 2 V := by
-    apply TensorPower.mulEquiv
-  have h2 : V⊗[k]V ≃ₗ[k] ⨂[k]^1 V ⊗[k] ⨂[k]^1 V := by
-    refine (congr ?f ?g).symm
-    · refine PiTensorProduct.subsingletonEquiv ?f.i₀
-      exact Fin.last 0
-    · refine PiTensorProduct.subsingletonEquiv ?f.i₀
-      -- exact Fin.last 0
-  exact h2.trans h1
+-- def TensorProduct.two_equiv : V⊗[k]V ≃ₗ[k] ⨂[k]^2 V := by
+--   have h1 : TensorProduct k (⨂[k]^1 V) (⨂[k]^1 V) ≃ₗ[k] TensorPower k 2 V := by
+--     apply TensorPower.mulEquiv
+--   have h2 : V⊗[k]V ≃ₗ[k] ⨂[k]^1 V ⊗[k] ⨂[k]^1 V := by
+--     refine (congr ?f ?g).symm
+--     · refine PiTensorProduct.subsingletonEquiv ?f.i₀
+--       exact Fin.last 0
+--     · refine PiTensorProduct.subsingletonEquiv ?f.i₀
+--       -- exact Fin.last 0
+--   exact h2.trans h1
 
-def TensorProduct.toTensorPower (v : V⊗[k]V) : ⨂[k]^2 V :=
-  (TensorProduct.two_equiv k V).toFun v
+-- def TensorProduct.toTensorPower (v : V⊗[k]V) : ⨂[k]^2 V :=
+--   (TensorProduct.two_equiv k V).toFun v
 
 def 𝔗' := ⨁ n, ⨂[k]^n V
 
-def 𝔗 := TensorAlgebra k V
+abbrev 𝔗 := TensorAlgebra k V
 
 def I := TwoSidedIdeal.span {(ιₜ x * ιₜ y - ιₜ y * ιₜ x) | (x : V) (y : V)}
 
 def 𝔖 := RingQuot (I k V).ringCon.r
 
-instance : Ring (𝔖 k V) := by sorry
+#check 𝔖 k V
 
-instance : Algebra k (𝔖 k V) := sorry
+instance : Ring (𝔖 k V) := inferInstanceAs (Ring (RingQuot (I k V).ringCon.r))
+
+instance : Algebra k (𝔖 k V) := inferInstanceAs (Algebra k (RingQuot (I k V).ringCon.r))
 
 def J := TwoSidedIdeal.span {ιₜ x * ιₜ y - ιₜ y * ιₜ x - ιₜ ⁅x, y⁆ | (x : V) (y : V)}
 
@@ -47,7 +49,7 @@ def filtration (m : ℕ) (T : Type*) [AddCommMonoid T] [Module k T] : Submodule 
 
 def T (m : ℕ) := filtration (k := k) m (TensorAlgebra k V)
 
-def equiv_finite_directSum : T k V m ≃ₗ[k] (⨁ (i: Fin (m+1)), ⨂[k]^i V) := sorry
+def equiv_finite_directSum : T k V m ≃ₗ[k] (⨁ (i : Fin (m + 1)), ⨂[k]^i V) := sorry
 
 -- def TensorSum (n : ℕ) := DirectSum (Fin (n+1)) fun (m : Fin (n+1)) => TensorPower k m V
 def π := RingQuot.mkAlgHom k (J k V).ringCon.r
