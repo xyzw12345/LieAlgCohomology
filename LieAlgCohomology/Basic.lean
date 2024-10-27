@@ -1,5 +1,6 @@
 import Mathlib
 
+#check TensorProduct
 #check groupCohomology
 #check Rep.trivial
 #check ExteriorAlgebra
@@ -39,8 +40,9 @@ variable {k : Type u} [Ring k]
 
 #synth Abelian (ModuleCat k)
 
-variable {V : Type u} [Category V] [Abelian V]
-#synth Limits.HasZeroMorphisms V
+variable {V W : Type u} [Category V] [Category W] (C : V ⥤ W) (v : V)
+
+#check ModuleCat.of
 noncomputable section
 universe u
 variable {k L R : Type u} [LieRing L] [CommRing R] [LieAlgebra R L] [CommRing k]
