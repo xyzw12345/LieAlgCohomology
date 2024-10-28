@@ -40,8 +40,9 @@ def filter_U (n : ℕ) : Submodule R (𝔘 R L) :=
 
 #synth GradedRing (graded_T R L)
 
-def filter_U' (n : ℕ) : Submodule R (filter_U R L n) := by sorry
+def filter_U' (n : ℕ) : Submodule R (filter_U R L (n + 1)) := by sorry
 
+set_option diagnostics true
 abbrev graded_G (n : ℕ) := (filter_U R L (n + 1)) ⧸ (filter_U' R L n)
 
 abbrev 𝔊 := ⨁ (n : ℕ), (graded_G R L n)
