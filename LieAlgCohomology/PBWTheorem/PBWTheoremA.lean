@@ -1,23 +1,22 @@
 import Mathlib
 
 open BigOperators TensorProduct DirectSum TensorAlgebra UniversalEnvelopingAlgebra
--- import Mathlib.RingTheory.TensorProduct.Basic
 
 -- set_option diagnostics true
 noncomputable section
 variable (R : Type*) [CommRing R]
-variable (L : Type*) [i11: AddCommMonoid L] [i12: Module R L] [i13: LieRing L] [i14: LieAlgebra R L] [Module.Free R L]
+variable (L : Type*) [i13: LieRing L] [i14: LieAlgebra R L] [Module.Free R L]
 
 local notation "ιₜ" => TensorAlgebra.ι R
 local notation "𝔘" => UniversalEnvelopingAlgebra
 local notation "π₁" => mkAlgHom
 -- local notation "𝔗" => TensorAlgebra
 
-abbrev 𝔗 := @TensorAlgebra R CommRing.toCommSemiring L i11 i12
+abbrev 𝔗 := TensorAlgebra R L
 
 #check MvPolynomial
 #synth Algebra R (MvPolynomial L R)
-#synth Module R (TensorAlgebra R L)
+#synth Module R (𝔗 R L)
 
 def I := TwoSidedIdeal.span {(ιₜ x * ιₜ y - ιₜ y * ιₜ x) | (x : L) (y : L)}
 
@@ -28,18 +27,18 @@ instance : Ring (𝔖 R L) := inferInstanceAs (Ring (RingQuot (I R L).ringCon.r)
 
 instance : Algebra R (𝔖 R L) := inferInstanceAs (Algebra R (RingQuot (I R L).ringCon.r))
 
--- def J := TwoSidedIdeal.span {ιₜ x * ιₜ y - ιₜ y * ιₜ x - ιₜ ⁅x, y⁆ | (x : L) (y : L)}
+def J := TwoSidedIdeal.span {ιₜ x * ιₜ y - ιₜ y * ιₜ x - ιₜ ⁅x, y⁆ | (x : L) (y : L)}
 
 #synth GradedRing ((LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ ·))
 
 abbrev graded_T (n : ℕ) := (LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ n)
+
+abbrev filter_T (n : ℕ) := ⨆ (m : Fin (n + 1)), (graded_T R L m.1)
+
+def filter_U (n : ℕ) : Submodule R (𝔘 R L) :=
+  Submodule.map (π₁ R L) (filter_T R L n)
+
 #synth GradedRing (graded_T R L)
-
-def filter_T (n : ℕ) := ⨆ (m : Fin (n + 1)), (graded_T R L m.1)
-
-def filter_U (n : ℕ) : Submodule R (𝔘 R L) := sorry
-  -- it's supposed to be the following definition, but it failed due to some weird instance inference problem.
-  -- Submodule.map (π₁ R L) (filter_T R L n)
 
 def filter_U' (n : ℕ) : Submodule R (filter_U R L n) := by sorry
 
