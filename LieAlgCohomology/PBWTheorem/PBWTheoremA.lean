@@ -61,3 +61,6 @@ def ω : (𝔖 R L) →ₐ[R] (𝔊 R L) := by
   refine RingQuot.liftAlgHom R (A := 𝔗 R L) (B := 𝔊 R L) ⟨ω' R L, ω'_liftable' R L⟩
 
 theorem PBW_A : Function.Bijective (ω R L) := sorry
+
+-- AlgEquiv.ofBijective gives us the expected algebra isomorphism.
+-- AlgEquiv.toLinearEquiv says that an AlgEquiv can be seen as a module isomorphism.
