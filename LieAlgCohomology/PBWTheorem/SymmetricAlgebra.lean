@@ -41,8 +41,7 @@ instance : CommRing (𝔖 R L) where
       have P_symm {x y : TensorAlgebra R L} (h : P x y) : P y x := h.symm
       have P_base (x y : L) : P (ι x) (ι y) := by
         unfold P
-        have : (SymRel R L) ((ι x) * (ι y)) ((ι y) * (ι x)):= SymRel.mul_comm x y
-        rw [Quot.sound (Rel.of this)]
+        rw [Quot.sound (Rel.of (SymRel.mul_comm x y))]
       apply TensorAlgebra.induction (C := fun y ↦ ∀ (x : TensorAlgebra R L), P x y) _ _ _ _ a
       · intro r; exact P_smul r
       · intro x; apply TensorAlgebra.induction
