@@ -1,6 +1,6 @@
 import Mathlib
 
-namespace SymmetricAlg
+namespace SymmetricAlgebra
 
 open MvPolynomial RingQuot
 
@@ -52,7 +52,7 @@ instance : CommRing (𝔖 R L) where
       · intro a1 a2 h1 h2 x; exact P_mul a1 a2 x (h1 x) (h2 x)
       · intro a1 a2 h1 h2 x; exact P_add a1 a2 x (h1 x) (h2 x)
 
-variable (I)
+variable (I : Type*)
 
 def symmetric_algebra_iso_mv_polynomial : MvPolynomial I R ≃ₐ[R] 𝔖 R (I →₀ R) :=
   AlgEquiv.ofAlgHom
