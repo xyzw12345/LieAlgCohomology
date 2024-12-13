@@ -1,26 +1,20 @@
 import Mathlib
-import LieAlgCohomology.PBWTheorem.SymmetricAlgebra
 
 noncomputable section
 
 variable (R : Type*) [CommRing R]
-variable (B : Type*) [LinearOrder B] [LieRing (B →₀ R)] [LieAlgebra R (B →₀ R)]
-#check FreeAlgebra R B
-#check MvPolynomial B R
-#synth Module R (B →₀ R)
-#check TensorAlgebra.equivFreeAlgebra
-
-
+variable (L : Type*) [LieRing L] [LieAlgebra R L] [Module.Free R L]
+variable (B : Type*) (basis : Basis B R L) [LinearOrder B]
 
 def π : FreeAlgebra R B →ₐ[R] MvPolynomial B R :=
   FreeAlgebra.lift R (fun b ↦ MvPolynomial.X b)
 
-def ω' : FreeAlgebra R B →ₐ[R] UniversalEnvelopingAlgebra R (B →₀ R) :=
-  sorry
+def ω' : FreeAlgebra R B →ₐ[R] UniversalEnvelopingAlgebra R L :=
+  (UniversalEnvelopingAlgebra.mkAlgHom R L).comp (TensorAlgebra.equivFreeAlgebra basis).symm.toAlgHom
 
 /-
 x : FreeAlgebra R B, x', ω' x = 0 → π x' = 0
-ω' : FreeAlgebra R B →ₐ[R] UniversalEnvelopingAlgebra R (B →₀ R)
+ω' : FreeAlgebra R B →ₐ[R] UniversalEnvelopingAlgebra R L
 π : FreeAlgebra R B →ₐ[R] MvPolynomial B R
 -/
 
@@ -33,5 +27,4 @@ TODO :
 3. Finish the statement of lemma_C as above.
 4. Find a way to inductively define the Lie Action on (MvPolynomial B R).
  (corresponding to Lemma A and Lemma B)
-
 -/
