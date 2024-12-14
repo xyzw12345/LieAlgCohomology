@@ -10,7 +10,8 @@ def π : FreeAlgebra R B →ₐ[R] MvPolynomial B R :=
   FreeAlgebra.lift R (fun b ↦ MvPolynomial.X b)
 
 def ω' : FreeAlgebra R B →ₐ[R] UniversalEnvelopingAlgebra R L :=
-  (UniversalEnvelopingAlgebra.mkAlgHom R L).comp (TensorAlgebra.equivFreeAlgebra basis).symm.toAlgHom
+  (UniversalEnvelopingAlgebra.mkAlgHom R L).comp
+    (TensorAlgebra.equivFreeAlgebra basis).symm.toAlgHom
 
 /-
 x : FreeAlgebra R B, x', ω' x = 0 → π x' = 0

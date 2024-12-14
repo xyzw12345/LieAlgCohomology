@@ -8,7 +8,8 @@ package "LieAlgCohomology" where
     ⟨`pp.unicode.fun, true⟩ -- pretty-prints `fun a ↦ b`
   ]
 
-require "leanprover-community" / "mathlib"
+-- require "leanprover-community" / "mathlib"
+require "Blackfeather007" / "Filtered_Ring" from git "https://github.com/Blackfeather007/Filtered_Ring"
 
 @[default_target]
 lean_lib «LieAlgCohomology» where
