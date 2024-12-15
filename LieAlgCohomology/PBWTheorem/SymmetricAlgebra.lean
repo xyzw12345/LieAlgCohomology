@@ -1,7 +1,5 @@
 import Mathlib
 
-namespace SymmetricAlgebra
-
 open MvPolynomial RingQuot
 
 noncomputable section
@@ -17,6 +15,8 @@ inductive SymRel : (TensorAlgebra R L) → (TensorAlgebra R L) → Prop :=
 def SymmetricAlgebra := RingQuot (SymRel R L)
 
 local notation "𝔖" => SymmetricAlgebra
+
+namespace SymmetricAlgebra
 
 instance : Ring (𝔖 R L) := inferInstanceAs (Ring (RingQuot (SymRel R L)))
 
@@ -52,21 +52,32 @@ instance : CommRing (𝔖 R L) where
       · intro a1 a2 h1 h2 x; exact P_mul a1 a2 x (h1 x) (h2 x)
       · intro a1 a2 h1 h2 x; exact P_add a1 a2 x (h1 x) (h2 x)
 
-variable (I : Type*)
+abbrev mkAlgHom : TensorAlgebra R L →ₐ[R] 𝔖 R L := RingQuot.mkAlgHom R (SymRel R L)
 
-def symmetric_algebra_iso_mv_polynomial : MvPolynomial I R ≃ₐ[R] 𝔖 R (I →₀ R) :=
+def iota : L →ₗ[R] 𝔖 R L := (mkAlgHom R L).toLinearMap.comp (TensorAlgebra.ι R (M := L))
+
+variable (I : Type*) (basis_I : Basis I R L)
+
+def symmetric_algebra_iso_mv_polynomial : MvPolynomial I R ≃ₐ[R] 𝔖 R L :=
   AlgEquiv.ofAlgHom
-    ⟨eval₂Hom (algebraMap R (𝔖 R (I →₀ R))) (fun i ↦ mkRingHom _ (ι (Finsupp.single i (1 : R)))), fun _ ↦ eval₂_C _ _ _⟩
-    (liftAlgHom R ⟨TensorAlgebra.lift R (Finsupp.linearCombination R (fun (i : I) ↦ ((X i) : MvPolynomial I R))), fun {u v} h ↦ match h with | SymRel.mul_comm x y => by simp [mul_comm]⟩)
+    ⟨eval₂Hom (algebraMap R (𝔖 R L)) (fun i ↦ mkRingHom _ (ι (basis_I i))), fun _ ↦ eval₂_C _ _ _⟩
+    (liftAlgHom R ⟨TensorAlgebra.lift R ((Finsupp.linearCombination R (fun (i : I) ↦ ((X i) : MvPolynomial I R))).comp basis_I.repr.1), fun {u v} h ↦ match h with | SymRel.mul_comm x y => by simp [mul_comm]⟩)
     (by
-      apply ringQuot_ext'; ext i
-      simp [SymmetricAlgebra]; rw [mkAlgHom, AlgHom.coe_mk])
+      apply ringQuot_ext'; apply TensorAlgebra.hom_ext; apply Basis.ext basis_I; intro i
+      simp [SymmetricAlgebra]; rw [RingQuot.mkAlgHom, AlgHom.coe_mk])
     (by
       apply algHom_ext; intro i
-      simp
-      have h1 : ((mkRingHom (SymRel R (I →₀ R))) (ι fun₀ | i => 1)) = ((mkAlgHom R (SymRel R (I →₀ R))) (ι fun₀ | i => 1)) := by rw [mkAlgHom, AlgHom.coe_mk]
-      have h2 : (TensorAlgebra.lift R) (Finsupp.linearCombination R (fun (i : I) ↦ ((X i) : MvPolynomial I R))) (ι fun₀ | i => 1) = X i := by simp
+      simp only [AlgHom.coe_comp, AlgHom.coe_mk, coe_eval₂Hom, Function.comp_apply, eval₂_X,
+        AlgHom.coe_id, id_eq]
+      have h1 : (mkRingHom (SymRel R L)) (ι (basis_I i)) = (RingQuot.mkAlgHom R (SymRel R L)) (ι (basis_I i)) := by rw [RingQuot.mkAlgHom, AlgHom.coe_mk]
+      have h2 : ((TensorAlgebra.lift R) ((Finsupp.linearCombination R fun i => (X i : MvPolynomial I R)) ∘ₗ basis_I.repr.1)) (ι (basis_I i)) = X i := by simp
       rw [← h2, h1]
       apply liftAlgHom_mkAlgHom_apply)
 
--- Want to show that this equivalence actually preserves the graded structure on 𝔖
+abbrev gradingSymmetricAlgebra : ℕ → Submodule R (𝔖 R L) :=
+  (Submodule.map (mkAlgHom R L)).comp
+    (LinearMap.range (TensorAlgebra.ι R : L →ₗ[R] TensorAlgebra R L) ^ ·)
+
+instance : GradedAlgebra (gradingSymmetricAlgebra R L) := sorry
+
+lemma proj_comm (x : TensorAlgebra R L) (m : ℕ) : mkAlgHom R L ((GradedAlgebra.proj ((LinearMap.range (TensorAlgebra.ι R : L →ₗ[R] TensorAlgebra R L) ^ ·)) m) x) = (GradedAlgebra.proj (gradingSymmetricAlgebra R L) m) (mkAlgHom R L x) := sorry

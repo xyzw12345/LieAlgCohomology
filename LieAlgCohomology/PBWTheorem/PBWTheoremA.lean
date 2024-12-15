@@ -1,66 +1,50 @@
 import Mathlib
+import FilteredRing.graded
 import LieAlgCohomology.PBWTheorem.SymmetricAlgebra
 
-open BigOperators TensorProduct DirectSum TensorAlgebra UniversalEnvelopingAlgebra SymmetricAlgebra
+open BigOperators TensorProduct DirectSum TensorAlgebra UniversalEnvelopingAlgebra
 
 /-
-The work on this file might have to stop for a while, as we're now communicating
-with the group that's working on graded/filtered objects since most constructions seems to
-be more generally applicable. They'll probably write something of more general usage, and
-we'll use those APIs after they've finished.
+The work on this file might have to stop for a while, as we're now communicating with the group that's working on graded/filtered objects since most constructions seems to be more generally applicable. They'll probably write something of more general usage, and we'll use those APIs after they've finished.
 
-So the current work will be focusing on the other missing things like symmetric algebra and
-some specific constructions in the proof.
+So the current work will be focusing on the other missing things like symmetric algebra and some specific constructions in the proof.
 -/
 
 noncomputable section
 variable (R : Type*) [CommRing R]
 variable (L : Type*) [LieRing L] [LieAlgebra R L] [Module.Free R L]
 
-local notation "ιₜ" => TensorAlgebra.ι R
-local notation "𝔘" => UniversalEnvelopingAlgebra
-local notation "π₁" => mkAlgHom
-local notation "𝔖" => SymmetricAlgebra
+local notation "ιₜ" => TensorAlgebra.ι R (M := L)
+local notation "𝔘" => UniversalEnvelopingAlgebra R L
+local notation "π" => UniversalEnvelopingAlgebra.mkAlgHom R L
+local notation "𝔖" => SymmetricAlgebra R L
+local notation "ω" => SymmetricAlgebra.mkAlgHom R L
+local notation "ιₛ" => SymmetricAlgebra.iota R L
 
 abbrev 𝔗 := TensorAlgebra
 
 #synth GradedRing ((LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ ·))
 
-abbrev graded_T (n : ℕ) := (LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ n)
+abbrev graded_T : ℕ → Submodule R (TensorAlgebra R L) := fun (n : ℕ) ↦
+  (LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ n)
 
-abbrev filter_T (n : ℕ) := ⨆ (m : Fin (n + 1)), (graded_T R L m.1)
+abbrev filter_T := induced_fil' (graded_T R L)
 
-def filter_U (n : ℕ) : Submodule R (𝔘 R L) :=
-  Submodule.map (π₁ R L) (filter_T R L n)
+abbrev graded_S := SymmetricAlgebra.gradingSymmetricAlgebra R L
 
-#synth GradedRing (graded_T R L)
+abbrev filter_S := induced_fil' (graded_S R L)
 
-def filter_U' (n : ℕ) : Submodule R (filter_U R L (n + 1)) := by sorry
+lemma aux_lemma_a : ∃ ρ : L →ₗ⁅R⁆ Module.End R 𝔖, (∀ m : ℕ, ∀ u : L, ∀ x : SymmetricAlgebra R L, x ∈ filter_S R L m → GradedAlgebra.proj (graded_S R L) (m + 1) ((ρ u) x) = GradedAlgebra.proj (graded_S R L) (m + 1) (x * (ιₛ u))) := sorry
 
--- set_option diagnostics true
-abbrev graded_G (n : ℕ) := (filter_U R L (n + 1)) ⧸ (filter_U' R L n)
-
-abbrev 𝔊 := ⨁ (n : ℕ), (graded_G R L n)
-
-instance : Ring (𝔊 R L) := sorry
-
-instance : Algebra R (𝔊 R L) := sorry
-
-def ω' : (𝔗 R L) →ₐ[R] (𝔊 R L) := sorry
-
-lemma ω'_liftable (x y : L) : (ω' R L) (ιₜ x * ιₜ y) = (ω' R L) (ιₜ y * ιₜ x) := by
+lemma aux_lemma_b : ∃ ρ : 𝔘 →ₐ[R] Module.End R 𝔖, (∀ m n : ℕ, ∀ x : TensorAlgebra R L, ∀ y : SymmetricAlgebra R L, x ∈ filter_T R L m → y ∈ filter_S R L n → GradedAlgebra.proj (graded_S R L) (m + n) ((ρ (π x)) y) = GradedAlgebra.proj (graded_S R L) (m + n) ((ω x) * y)) := by
+  obtain ⟨ρ, hρ⟩ := aux_lemma_a R L
+  use UniversalEnvelopingAlgebra.lift R ρ
   sorry
 
-lemma ω'_liftable' (x y : 𝔗 R L) : SymRel R L x y → (ω' R L) x = (ω' R L) y := fun h ↦ (
-  match h with
-  | SymRel.mul_comm u v => ω'_liftable R L u v
-)
-
-def ω : (𝔖 R L) →ₐ[R] (𝔊 R L) := by
-  show (RingQuot (SymRel R L)) →ₐ[R] (𝔊 R L)
-  refine RingQuot.liftAlgHom R (A := 𝔗 R L) (B := 𝔊 R L) ⟨ω' R L, ω'_liftable' R L⟩
-
-theorem PBW_A : Function.Bijective (ω R L) := sorry
-
--- AlgEquiv.ofBijective gives us the expected algebra isomorphism.
--- AlgEquiv.toLinearEquiv says that an AlgEquiv can be seen as a module isomorphism.
+lemma aux_lemma_c (x : TensorAlgebra R L) (m : ℕ) (h : x ∈ filter_T R L m)
+  (heq : π x = 0) : ω (GradedAlgebra.proj (graded_T R L) m x) = 0 := by
+    obtain ⟨ρ, hρ⟩ := aux_lemma_b R L
+    specialize hρ m 0 x 1 h (by apply FilteredRing.one)
+    rw [heq, map_zero, add_zero, mul_one, LinearMap.zero_apply, map_zero] at hρ
+    rw [hρ]
+    exact SymmetricAlgebra.proj_comm R L x m

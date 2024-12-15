@@ -9,9 +9,11 @@ variable (B : Type*) (basis : Basis B R L) [LinearOrder B]
 def π : FreeAlgebra R B →ₐ[R] MvPolynomial B R :=
   FreeAlgebra.lift R (fun b ↦ MvPolynomial.X b)
 
+abbrev iso : FreeAlgebra R B ≃ₐ[R] TensorAlgebra R L :=
+  (TensorAlgebra.equivFreeAlgebra basis).symm
+
 def ω' : FreeAlgebra R B →ₐ[R] UniversalEnvelopingAlgebra R L :=
-  (UniversalEnvelopingAlgebra.mkAlgHom R L).comp
-    (TensorAlgebra.equivFreeAlgebra basis).symm.toAlgHom
+  (UniversalEnvelopingAlgebra.mkAlgHom R L).comp (iso R L B basis).toAlgHom
 
 /-
 x : FreeAlgebra R B, x', ω' x = 0 → π x' = 0
