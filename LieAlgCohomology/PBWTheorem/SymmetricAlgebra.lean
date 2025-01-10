@@ -1,4 +1,5 @@
 import Mathlib
+import LieAlgCohomology.MissingLemmas.HomogeneousRelation
 
 open MvPolynomial RingQuot
 
@@ -11,6 +12,8 @@ local notation "ι" => TensorAlgebra.ι R
 
 inductive SymRel : (TensorAlgebra R L) → (TensorAlgebra R L) → Prop :=
   | mul_comm (x y : L) : SymRel (ι x * ι y) (ι y * ι x)
+
+instance : IsHomogeneousRelation ((LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ ·)) (SymRel R L) := sorry
 
 def SymmetricAlgebra := RingQuot (SymRel R L)
 
