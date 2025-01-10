@@ -2,16 +2,7 @@ import Mathlib
 import LieAlgCohomology.MissingLemmas.TwoSidedIdeal
 
 /-
-· expected relations with: HomogeneousIdeal, TwoSidedIdeal, (Ideal?)
-  (add simp lemmas, ...)
-· In the case of Commring, prove the equivalence between this and HomogeneousIdeal
-· expected instance: SetLike, HasQuotient
-· GradedRing / GradedAlgebra on quotient ring
-· a homogeneous relation extends to a HomogeneousTwoSidedIdeal
-
-following:
-  Mathlib.RingTheory.GradedAlgebra.HomogeneousIdeal
-  Mathlib.RingTheory.TwoSidedIdeal.Operations
+The interaction between TwoSidedIdeal and Ideals seems to be not as good as we'd expected, and another PR involving reconstructing two-sided ideals is currently being reviewed at #17908. So, we decided not to mess with TwoSidedIdeal. Instead, we will try to state and prove the necessary things in homogeneous relations. (which actually made things easier to use for SymmetricAlgebra)
 -/
 
 #check RingQuot.mkRingHom
@@ -46,8 +37,6 @@ instance : IsHomogeneousRelation 𝒜 (RingQuot.Rel rel) := ⟨by
   case mul_left a b c h_rel h => sorry
   case mul_right a b c h_rel h => sorry
 ⟩
-
-#help tactic
 
 instance : IsHomogeneousRelation 𝒜 (Relation.EqvGen rel) := ⟨by
   intro x y h; induction h
