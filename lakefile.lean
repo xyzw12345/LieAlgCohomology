@@ -9,7 +9,8 @@ package "LieAlgCohomology" where
   ]
 
 -- require "leanprover-community" / "mathlib"
-require "Blackfeather007" / "Filtered_Ring" from git "https://github.com/Blackfeather007/Filtered_Ring"
+require "Blackfeather007" / "Filtered_Ring" from
+  git "https://github.com/Blackfeather007/Filtered_Ring.git" @ "main"
 
 @[default_target]
 lean_lib «LieAlgCohomology» where
