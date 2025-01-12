@@ -21,6 +21,7 @@ local notation "𝔖" => SymmetricAlgebra R L
 local notation "ω" => SymmetricAlgebra.mkAlgHom R L
 local notation "ιₛ" => SymmetricAlgebra.iota R L
 
+#check LieRing
 abbrev 𝔗 := TensorAlgebra
 
 #synth GradedRing ((LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ ·))
@@ -29,6 +30,8 @@ abbrev graded_T : ℕ → Submodule R (TensorAlgebra R L) := fun (n : ℕ) ↦
   (LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ n)
 
 abbrev filter_T := induced_fil' (graded_T R L)
+
+#synth FilteredAlgebra (filter_T R L)
 
 abbrev graded_S := SymmetricAlgebra.gradingSymmetricAlgebra R L
 
@@ -39,6 +42,7 @@ lemma aux_lemma_a : ∃ ρ : L →ₗ⁅R⁆ Module.End R 𝔖, (∀ m : ℕ, �
 lemma aux_lemma_b : ∃ ρ : 𝔘 →ₐ[R] Module.End R 𝔖, (∀ m n : ℕ, ∀ x : TensorAlgebra R L, ∀ y : SymmetricAlgebra R L, x ∈ filter_T R L m → y ∈ filter_S R L n → GradedAlgebra.proj (graded_S R L) (m + n) ((ρ (π x)) y) = GradedAlgebra.proj (graded_S R L) (m + n) ((ω x) * y)) := by
   obtain ⟨ρ, hρ⟩ := aux_lemma_a R L
   use UniversalEnvelopingAlgebra.lift R ρ
+  -- some kind of induction would finish this step.
   sorry
 
 lemma aux_lemma_c (x : TensorAlgebra R L) (m : ℕ) (h : x ∈ filter_T R L m)

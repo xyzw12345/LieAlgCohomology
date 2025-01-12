@@ -9,7 +9,7 @@ The interaction between TwoSidedIdeal and Ideals seems to be not as good as we'd
 #check RingQuot.mkAlgHom
 
 variable {ι : Type*} [DecidableEq ι] [AddMonoid ι]
-variable {A : Type*} [Ring A]
+variable {A : Type*} [Semiring A]
 
 class IsHomogeneousRelation {σ : Type*} [SetLike σ A] [AddSubmonoidClass σ A] (𝒜 : ι → σ) [GradedRing 𝒜] (r : A → A → Prop) : Prop
   where
@@ -44,7 +44,7 @@ instance : IsHomogeneousRelation 𝒜 (Relation.EqvGen rel) := ⟨by
     intro i;
     rcases (inst.is_homogeneous' h_rel i) with (h1 | h2)
     · left; exact h1
-    · right; exact Relation.EqvGen.rel ((GradedRing.proj 𝒜 i) x) ((GradedRing.proj 𝒜 i) y) h2
+    · right; exact Relation.EqvGen.rel _ _ h2
   case refl x => intro i; left; rfl
   case symm x y _ h =>
     intro i

@@ -13,17 +13,21 @@ local notation "ι" => TensorAlgebra.ι R
 inductive SymRel : (TensorAlgebra R L) → (TensorAlgebra R L) → Prop :=
   | mul_comm (x y : L) : SymRel (ι x * ι y) (ι y * ι x)
 
-instance : IsHomogeneousRelation ((LinearMap.range (ι R : L →ₗ[R] TensorAlgebra R L) ^ ·)) (SymRel R L) := sorry
+instance : IsHomogeneousRelation (fun (n : ℕ) ↦ (LinearMap.range (ι : L →ₗ[R] TensorAlgebra R L) ^ n)) (SymRel R L) := ⟨by
+  have h_iota (x : L) : (ι x) ∈ (fun (n : ℕ) ↦ (LinearMap.range (ι : L →ₗ[R] TensorAlgebra R L) ^ n)) 1 := by
+    simp only [pow_one, LinearMap.mem_range, TensorAlgebra.ι_inj, exists_eq]
+  have h_iota2 (x y : L) : (ι x * ι y) ∈ (fun (n : ℕ) ↦ (LinearMap.range (ι : L →ₗ[R] TensorAlgebra R L) ^ n)) 2 := by
+    simp only [pow_two]; apply Submodule.mul_mem_mul; simp; simp
+  intro x y h; induction h
+  case mul_comm x y =>
+    sorry
+⟩
 
-def SymmetricAlgebra := RingQuot (SymRel R L)
+abbrev SymmetricAlgebra := RingQuot (SymRel R L)
 
 local notation "𝔖" => SymmetricAlgebra
 
 namespace SymmetricAlgebra
-
-instance : Ring (𝔖 R L) := inferInstanceAs (Ring (RingQuot (SymRel R L)))
-
-instance : Algebra R (𝔖 R L) := inferInstanceAs (Algebra R (RingQuot (SymRel R L)))
 
 instance : CommRing (𝔖 R L) where
   mul_comm a b := match a, b with
@@ -81,6 +85,7 @@ abbrev gradingSymmetricAlgebra : ℕ → Submodule R (𝔖 R L) :=
   (Submodule.map (mkAlgHom R L)).comp
     (LinearMap.range (TensorAlgebra.ι R : L →ₗ[R] TensorAlgebra R L) ^ ·)
 
-instance : GradedAlgebra (gradingSymmetricAlgebra R L) := sorry
+#synth GradedAlgebra (gradingSymmetricAlgebra R L)
 
-lemma proj_comm (x : TensorAlgebra R L) (m : ℕ) : mkAlgHom R L ((GradedAlgebra.proj ((LinearMap.range (TensorAlgebra.ι R : L →ₗ[R] TensorAlgebra R L) ^ ·)) m) x) = (GradedAlgebra.proj (gradingSymmetricAlgebra R L) m) (mkAlgHom R L x) := sorry
+lemma proj_comm (x : TensorAlgebra R L) (m : ℕ) : mkAlgHom R L ((GradedAlgebra.proj ((LinearMap.range (TensorAlgebra.ι R : L →ₗ[R] TensorAlgebra R L) ^ ·)) m) x) = (GradedAlgebra.proj (gradingSymmetricAlgebra R L) m) (mkAlgHom R L x) := by
+  sorry
